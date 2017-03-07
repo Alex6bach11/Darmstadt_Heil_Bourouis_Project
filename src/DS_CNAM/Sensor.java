@@ -20,8 +20,6 @@ public class Sensor {
     static String host = new String("localhost");
     static int port = 1313;
 
-    //private static JsonObject currentValues = initializeValues();
-
     private static JsonObject initializeValues() {
         Random r = new Random();
         JsonObject obj = Json.createObjectBuilder()
@@ -32,8 +30,7 @@ public class Sensor {
         return obj;
     }
 
-    private static void replaceValue(String key, float value) {
-        JsonObject currentValues = Fridge.getCurrentValues();
+    private static JsonObject replaceValue(JsonObject currentValues, String key, float value) {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         Set<String> set = currentValues.keySet();
         Iterator iter = set.iterator();
@@ -47,6 +44,7 @@ public class Sensor {
             }
         }
         currentValues = builder.build();
+        return currentValues;
     }
 
     public static void main(String[] args) throws IOException {
@@ -76,6 +74,7 @@ public class Sensor {
 
     private static void decrease() {
         Float f;
+        int i = 0;
         JsonObject currentValues = Fridge.getCurrentValues();
         Random r = new Random();
         Set<String> key = currentValues.keySet();
@@ -84,19 +83,20 @@ public class Sensor {
         while(iter.hasNext()) {
             next = iter.next().toString();
             f= Float.parseFloat(currentValues.get(next).toString());
-            System.out.println("f =" +  f);
-            f -= r.nextInt();
-            if (f >= 0){
-                replaceValue(next, f);
+            System.out.println("f avant=" +  f);
+            i = r.nextInt();
+            f -= i;
+            System.out.println("f apres=" +  f);
+            if (f > 0) {
+                currentValues = replaceValue(currentValues, next, f);
             }
-            else
-            {
-                replaceValue(next, 0f);
+            else {
+                currentValues = replaceValue(currentValues, next, 0f);
             }
         }
+        System.out.println(currentValues);
+        Fridge.setCurrentValues(currentValues);
+        System.out.println(Fridge.getCurrentValues());
         // currentValues.forEach();
-
-
-
     }
 }

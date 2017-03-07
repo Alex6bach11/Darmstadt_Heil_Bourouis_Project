@@ -20,19 +20,19 @@ public class Fridge {
 
     private static JsonObject initializeWarningLevels() {
         JsonObject obj = Json.createObjectBuilder()
-                .add("Tequila", 1.0f)
-                .add("Chicken", 1.0f)
-                .add("Milk", 1.0f)
-                .add("Limes", 2.0f).build();
+                .add("Tequila", 15555.0f)
+                .add("Chicken", 1656.0f)
+                .add("Milk", 1555.0f)
+                .add("Limes", 2222.0f).build();
         return obj;
     }
 
     private static JsonObject initializeValues() {
         JsonObject obj = Json.createObjectBuilder()
-                .add("Tequila", 1.0f)
-                .add("Chicken", 1.0f)
-                .add("Milk", 1.0f)
-                .add("Limes", 2.0f).build();
+                .add("Tequila", 1111.0f)
+                .add("Chicken", 111.0f)
+                .add("Milk", 1111.0f)
+                .add("Limes", 22222.0f).build();
         return obj;
     }
     public static void main(String[] args) {
