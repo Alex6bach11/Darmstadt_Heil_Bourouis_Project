@@ -1,22 +1,12 @@
 package DS_CNAM;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.util.Date;
 import javax.json.Json;
 import javax.json.*;
 
-
-/**
- * Created by aheil on 06/03/2017.
- */
 public class Fridge {
 
     private static JsonObject warningLevels = initializeWarningLevels();
     private static JsonObject currentValues ;
-
-
 
     private static JsonObject initializeWarningLevels() {
         JsonObject obj = Json.createObjectBuilder()
@@ -26,7 +16,6 @@ public class Fridge {
                 .add("Limes", 2222.0f).build();
         return obj;
     }
-
 
     public static void main(String[] args) {
         try

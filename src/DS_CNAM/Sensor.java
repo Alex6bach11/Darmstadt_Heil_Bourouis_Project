@@ -3,7 +3,6 @@ package DS_CNAM;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-import javax.json.JsonValue;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -12,12 +11,9 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
-/**
- * Created by aheil on 06/03/2017.
- */
 public class Sensor {
     //  static String host = new String("192.168.178.20");
-    static String host = new String("localhost");
+    static String host = new String("141.100.45.127");
     static int port = 1313;
     private static JsonObject currentValues ;
 

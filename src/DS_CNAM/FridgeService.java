@@ -6,11 +6,8 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-/**
- * Created by aheil on 06/03/2017.
- */
 public class FridgeService extends Thread{
-    Socket client;
+    private Socket client;
 
     FridgeService(Socket client){this.client = client;}
 
