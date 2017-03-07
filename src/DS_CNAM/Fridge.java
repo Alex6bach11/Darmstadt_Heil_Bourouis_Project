@@ -37,4 +37,12 @@ public class Fridge {
     public static synchronized void setCurrentValues(JsonObject currentValues) {
         Fridge.currentValues = currentValues;
     }
+
+    public static JsonObject getWarningLevels() {
+        return warningLevels;
+    }
+
+    public static void setWarningLevels(JsonObject warningLevels) {
+        Fridge.warningLevels = warningLevels;
+    }
 }
