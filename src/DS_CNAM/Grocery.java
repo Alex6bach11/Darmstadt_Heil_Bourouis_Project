@@ -5,33 +5,44 @@ import org.apache.xmlrpc.server.XmlRpcServer;
 import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Grocery {
 
     ArrayList<Product> products = new ArrayList<>();
-
-  public Integer add(int x, int y) {
-    return new Integer(x+y);
-  }
-
-  public Integer sub(int x, int y) {
-    return new Integer(x-y);
-  }
-
-  public Integer mul(int x, int y) {
-    return new Integer(x*y);
-  }
+    private static File tmpFile;
 
   private static final int port = 8080;
 
-  private void addCommandeToHistory(String product, float price, float quantity) {
+    private ArrayList<Product> initializeProducts() {
+        return null;
+    }
+  private static void addCommandToHistory(String product, float price, float quantity) {
+      try{
+          PrintWriter writer;
+          if( tmpFile == null) {
+              tmpFile = File.createTempFile("GroceryLog", ".csv");
+              writer = new PrintWriter(tmpFile);
+              writer.println("Product;Price;Quantity");
+          }
+          else {
+              writer = new PrintWriter(new FileWriter(tmpFile, true));
+          }
 
+          writer.println(product + ";" +price +";"+ quantity +";");
+          writer.close();
+      } catch (IOException e) {
+          System.out.println(e);
+      }
   }
 
   public static void main (String [] args) {
-    try {
+
+      addCommandToHistory("Product 1", 1.4f, 25.0f);
+      addCommandToHistory("Product 2", 1.8f, 26.0f);
+    /*try {
 
       WebServer webServer = new WebServer(port);
 
@@ -52,6 +63,6 @@ public class Grocery {
 
     } catch (Exception exception) {
        System.err.println("JavaServer: " + exception);
-    }
+    }*/
   }
 }
