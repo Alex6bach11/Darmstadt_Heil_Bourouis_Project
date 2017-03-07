@@ -19,14 +19,14 @@ public class Sensor {
     //  static String host = new String("192.168.178.20");
     static String host = new String("localhost");
     static int port = 1313;
+    private static JsonObject currentValues ;
 
     private static JsonObject initializeValues() {
-        Random r = new Random();
         JsonObject obj = Json.createObjectBuilder()
-                .add("Tequila", r.nextFloat())
-                .add("Chicken", r.nextFloat())
-                .add("Milk", r.nextFloat())
-                .add("Limes", r.nextFloat()).build();
+                .add("Tequila", 111.0f)
+                .add("Chicken", 111.0f)
+                .add("Milk", 111.0f)
+                .add("Limes", 222.0f).build();
         return obj;
     }
 
@@ -56,14 +56,17 @@ public class Sensor {
         while (true) {
             // Construct and send Request
             socket = new DatagramSocket();
-            msg = Fridge.getCurrentValues().toString().getBytes();
+            decrease();
+            System.out.println("rrrr" + currentValues);
+            msg = currentValues.toString().getBytes();
+
             address = InetAddress.getByName(host);
 
             packet = new DatagramPacket(msg, msg.length, address, port);
             socket.send(packet);
 
             socket.close();
-            decrease();
+
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -74,29 +77,30 @@ public class Sensor {
 
     private static void decrease() {
         Float f;
-        int i = 0;
-        JsonObject currentValues = Fridge.getCurrentValues();
-        Random r = new Random();
-        Set<String> key = currentValues.keySet();
-        Iterator iter = key.iterator();
-        String next = "";
-        while(iter.hasNext()) {
-            next = iter.next().toString();
-            f= Float.parseFloat(currentValues.get(next).toString());
-            System.out.println("f avant=" +  f);
-            i = r.nextInt();
-            f -= i;
-            System.out.println("f apres=" +  f);
-            if (f > 0) {
-                currentValues = replaceValue(currentValues, next, f);
-            }
-            else {
-                currentValues = replaceValue(currentValues, next, 0f);
+        System.out.println("Begin of " + currentValues);
+        if( currentValues != null) {
+            Random r = new Random();
+            Set<String> key = currentValues.keySet();
+            Iterator iter = key.iterator();
+            String next = "";
+            while (iter.hasNext()) {
+                next = iter.next().toString();
+                f = Float.parseFloat(currentValues.get(next).toString());
+
+                //to have a positive value
+                f -= r.nextInt(Integer.SIZE-1)%10;
+
+                if (f > 0) {
+                    currentValues = replaceValue(currentValues, next, f);
+                } else {
+                    currentValues = replaceValue(currentValues, next, 0f);
+                }
             }
         }
-        System.out.println(currentValues);
-        Fridge.setCurrentValues(currentValues);
-        System.out.println(Fridge.getCurrentValues());
-        // currentValues.forEach();
+        else {
+            System.out.println("Tets");
+            currentValues = initializeValues();
+        }
+
     }
 }

@@ -40,7 +40,9 @@ public class UDPFridgeServer extends Thread {
                 // Decode sender, ignore all other content
                 message = new String(packet.getData());
                 reader = Json.createReader(new StringReader(message));
+                //System.out.println("Test " + reader.readObject());
                 Fridge.setCurrentValues(reader.readObject());
+                System.out.println("Test" + Fridge.getCurrentValues());
             }
         }
         catch (Exception e)

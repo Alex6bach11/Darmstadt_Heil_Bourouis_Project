@@ -14,7 +14,7 @@ import javax.json.*;
 public class Fridge {
 
     private static JsonObject warningLevels = initializeWarningLevels();
-    private static JsonObject currentValues = initializeValues();
+    private static JsonObject currentValues ;
 
 
 
@@ -27,46 +27,13 @@ public class Fridge {
         return obj;
     }
 
-    private static JsonObject initializeValues() {
-        JsonObject obj = Json.createObjectBuilder()
-                .add("Tequila", 1111.0f)
-                .add("Chicken", 111.0f)
-                .add("Milk", 1111.0f)
-                .add("Limes", 22222.0f).build();
-        return obj;
-    }
+
     public static void main(String[] args) {
         try
         {
-
-            byte data[] = new byte[1024];
-            /*DatagramPacket packet;
-            DatagramSocket socket = new DatagramSocket(1313);
-            System.out.println("UDP Time Server started at Port 1313");*/
             //treatment with the sensors
             new UDPFridgeServer().start();
             new TCPFridgeServer().start();
-            //treatment with the browser
-
-
-          /*  while ( true )
-            {
-                // Wait for request
-                packet = new DatagramPacket(data, data.length);
-                socket.receive(packet);
-                // Decode sender, ignore all other content
-                InetAddress address = packet.getAddress();
-                int         port   = packet.getPort();
-                // Encode answer
-                String s = "Time for " + address
-                        + " Port "  + port + " = "
-                        + new Date().toString() + "\n";
-                data = s.getBytes();
-                System.out.print( s );
-                // Send ansswer
-                packet = new DatagramPacket(data,data.length,address,port);
-                socket.send(packet);
-            }*/
         }
         catch (Exception e)
         {
@@ -74,11 +41,11 @@ public class Fridge {
         }
     }
 
-    public static JsonObject getCurrentValues() {
-        return currentValues;
+    public static synchronized JsonObject getCurrentValues() {
+        return Fridge.currentValues;
     }
 
-    public static void setCurrentValues(JsonObject currentValues) {
+    public static synchronized void setCurrentValues(JsonObject currentValues) {
         Fridge.currentValues = currentValues;
     }
 }
