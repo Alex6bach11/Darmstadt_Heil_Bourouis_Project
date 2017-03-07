@@ -18,11 +18,14 @@ public class Sensor {
     private static JsonObject currentValues ;
 
     private static JsonObject initializeValues() {
+        Random r = new Random();
+        int modulo = 1000;
         JsonObject obj = Json.createObjectBuilder()
-                .add("Tequila", 111.0f)
-                .add("Chicken", 111.0f)
-                .add("Milk", 111.0f)
-                .add("Limes", 222.0f).build();
+                .add("Tequila", (r.nextInt(Integer.SIZE-1)%modulo) + modulo)
+                .add("Chicken", (r.nextInt(Integer.SIZE-1)%modulo) + modulo)
+                .add("Milk", (r.nextInt(Integer.SIZE-1)%modulo) + modulo)
+                .add("Limes", (r.nextInt(Integer.SIZE-1)%modulo) + modulo).build();
+        System.out.println(obj);
         return obj;
     }
 
@@ -46,13 +49,16 @@ public class Sensor {
     public static void main(String[] args) throws IOException {
         System.out.println("UDP Sensor Client started...");
         DatagramSocket socket;
+        int sleepTime;
         byte msg[];
         InetAddress address;
         DatagramPacket packet;
+        Random r = new Random();
         while (true) {
             // Construct and send Request
             socket = new DatagramSocket();
             decrease();
+            System.out.println(currentValues.toString());
             msg = currentValues.toString().getBytes();
 
             address = InetAddress.getByName(host);
@@ -63,7 +69,9 @@ public class Sensor {
             socket.close();
 
             try {
-                Thread.sleep(1000);
+                sleepTime = r.nextInt(Integer.SIZE-1) + 1000;
+                System.out.println(sleepTime);
+                Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -83,7 +91,7 @@ public class Sensor {
                 f = Float.parseFloat(currentValues.get(next).toString());
 
                 //to have a positive value
-                f -= r.nextInt(Integer.SIZE-1)%10;
+                f -= r.nextInt(Integer.SIZE-1)%5;
 
                 if (f > 0) {
                     currentValues = replaceValue(currentValues, next, f);
