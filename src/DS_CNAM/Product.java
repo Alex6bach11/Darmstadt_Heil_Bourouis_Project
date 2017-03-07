@@ -1,8 +1,5 @@
 package DS_CNAM;
 
-/**
- * Created by aheil on 07/03/2017.
- */
 public class Product {
     private String name;
     private float quantity;
@@ -14,11 +11,11 @@ public class Product {
         this.price = price;
     }
 
-    public String getNom() {
+    public String getName() {
         return name;
     }
 
-    public void setNom(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -36,5 +33,17 @@ public class Product {
 
     public void setPrice(float price) {
         this.price = price;
+    }
+
+    public void sell(int quantity) {
+        if (quantity <= this.quantity) {
+            this.quantity -= quantity;
+        } else {
+            System.err.println("Not enough products !");
+        }
+    }
+
+    public void changePriceRandomly() {
+
     }
 }

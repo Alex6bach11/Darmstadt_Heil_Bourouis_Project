@@ -7,18 +7,14 @@ import org.apache.xmlrpc.webserver.WebServer;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Grocery {
 
-    ArrayList<Product> products = new ArrayList<>();
+  private ArrayList<Product> products = initializeProducts();
     private static File tmpFile;
 
   private static final int port = 8080;
 
-    private ArrayList<Product> initializeProducts() {
-        return null;
-    }
   private static void addCommandToHistory(String product, float price, float quantity) {
       try{
           PrintWriter writer;
@@ -36,6 +32,58 @@ public class Grocery {
       } catch (IOException e) {
           System.out.println(e);
       }
+  private static final int port = 8080;
+
+  private void addCommandToHistory(String product, float price, float quantity) {
+
+  }
+
+  private Product getProductByName(String productName) {
+    for (Product product : products)
+    {
+      if (product.getName().toLowerCase() == productName.toLowerCase())
+      {
+        return product;
+      }
+    }
+    return null;
+  }
+
+  private ArrayList<Product> initializeProducts() {
+    ArrayList<Product> products = new ArrayList<>();
+    products.add(new Product("Tequila", ));
+    products.add(new Product("Tequila", ));
+    products.add(new Product("Tequila", ));
+    products.add(new Product("Tequila", ));
+    return products;
+  }
+
+  /**
+   *
+   * @param productName The name of the product to buy
+   * @param quantity The quantity to buy
+   * @return an empty string if the transaction is successful or the error if it isn't
+   */
+  public String buy(String productName, int quantity) {
+    Product product = getProductByName(productName);
+    if (product != null) {
+      if (product.getQuantity() >= quantity && quantity > 0) {
+        try {
+          product.sell(quantity);
+          addCommandToHistory(productName, product.getPrice(), quantity);
+          return "";
+        } catch (Error e) {
+          e.printStackTrace();
+          return e.getMessage();
+        }
+      }
+      else {
+        return "Product not available in this quantity (" + product.getQuantity() + " remaining)";
+      }
+    }
+    else {
+      return "Product not available";
+    }
   }
 
   public static void main (String [] args) {
@@ -49,7 +97,7 @@ public class Grocery {
       XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
       PropertyHandlerMapping phm = new PropertyHandlerMapping();
 
-      phm.addHandler( "Calculator", Grocery.class);
+      phm.addHandler( "Grocery", Grocery.class);
       xmlRpcServer.setHandlerMapping(phm);
 
      XmlRpcServerConfigImpl serverConfig =
@@ -58,8 +106,7 @@ public class Grocery {
      // serverConfig.setContentLengthOptional(false);
 
       webServer.start();
-
-      System.out.println("The Calculator Server has been started..." );
+      System.out.println("The Grocery Server has been started..." );
 
     } catch (Exception exception) {
        System.err.println("JavaServer: " + exception);
