@@ -53,7 +53,6 @@ public class Sensor {
             // Construct and send Request
             socket = new DatagramSocket();
             decrease();
-            System.out.println("rrrr" + currentValues);
             msg = currentValues.toString().getBytes();
 
             address = InetAddress.getByName(host);
@@ -73,7 +72,7 @@ public class Sensor {
 
     private static void decrease() {
         Float f;
-        System.out.println("Begin of " + currentValues);
+
         if( currentValues != null) {
             Random r = new Random();
             Set<String> key = currentValues.keySet();
@@ -94,7 +93,6 @@ public class Sensor {
             }
         }
         else {
-            System.out.println("Tets");
             currentValues = initializeValues();
         }
 

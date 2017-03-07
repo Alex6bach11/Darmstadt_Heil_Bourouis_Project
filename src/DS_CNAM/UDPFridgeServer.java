@@ -42,7 +42,6 @@ public class UDPFridgeServer extends Thread {
                 reader = Json.createReader(new StringReader(message));
                 //System.out.println("Test " + reader.readObject());
                 Fridge.setCurrentValues(reader.readObject());
-                System.out.println("Test" + Fridge.getCurrentValues());
             }
         }
         catch (Exception e)

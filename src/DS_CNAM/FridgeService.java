@@ -42,7 +42,6 @@ public class FridgeService extends Thread{
                 System.out.println("Received: "+ line != null ? line : "");
 
                 if (line == null || line.isEmpty() ) {
-                    System.out.println("Break Connection\n");
                     verbunden = false;   // Break Connection?
                 }
                 else {
