@@ -7,35 +7,31 @@ import org.apache.xmlrpc.webserver.WebServer;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Grocery {
 
-  private ArrayList<Product> products = initializeProducts();
-    private static File tmpFile;
+  private static ArrayList<Product> products = initializeProducts();
+  private static File tmpFile;
 
   private static final int port = 8080;
 
   private static void addCommandToHistory(String product, float price, float quantity) {
-      try{
+      try {
           PrintWriter writer;
-          if( tmpFile == null) {
+          if (tmpFile == null) {
               tmpFile = File.createTempFile("GroceryLog", ".csv");
               writer = new PrintWriter(tmpFile);
               writer.println("Product;Price;Quantity");
-          }
-          else {
+          } else {
               writer = new PrintWriter(new FileWriter(tmpFile, true));
           }
 
-          writer.println(product + ";" +price +";"+ quantity +";");
+          writer.println(product + ";" + price + ";" + quantity + ";");
           writer.close();
       } catch (IOException e) {
           System.out.println(e);
       }
-  private static final int port = 8080;
-
-  private void addCommandToHistory(String product, float price, float quantity) {
-
   }
 
   private Product getProductByName(String productName) {
@@ -49,12 +45,13 @@ public class Grocery {
     return null;
   }
 
-  private ArrayList<Product> initializeProducts() {
+  private static ArrayList<Product> initializeProducts() {
     ArrayList<Product> products = new ArrayList<>();
-    products.add(new Product("Tequila", ));
-    products.add(new Product("Tequila", ));
-    products.add(new Product("Tequila", ));
-    products.add(new Product("Tequila", ));
+    Random random = new Random();
+    products.add(new Product("Tequila", random.nextInt(), random.nextFloat()));
+    products.add(new Product("Chicken", random.nextInt(), random.nextFloat()));
+    products.add(new Product("Milk", random.nextInt(), random.nextFloat()));
+    products.add(new Product("Limes", random.nextInt(), random.nextFloat()));
     return products;
   }
 
@@ -87,11 +84,7 @@ public class Grocery {
   }
 
   public static void main (String [] args) {
-
-      addCommandToHistory("Product 1", 1.4f, 25.0f);
-      addCommandToHistory("Product 2", 1.8f, 26.0f);
-    /*try {
-
+    try {
       WebServer webServer = new WebServer(port);
 
       XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
@@ -107,9 +100,13 @@ public class Grocery {
 
       webServer.start();
       System.out.println("The Grocery Server has been started..." );
-
+      Random rand = new Random();
+      while (true) { // reinitialize quantities and prices
+          Thread.sleep(rand.nextInt() * 10000 + 1);
+          products = initializeProducts();
+      }
     } catch (Exception exception) {
        System.err.println("JavaServer: " + exception);
-    }*/
+    }
   }
 }
