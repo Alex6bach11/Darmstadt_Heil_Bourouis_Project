@@ -47,7 +47,7 @@ public class FridgeService extends Thread{
                     verbunden = false;   // Break Connection?
                 else {
                     System.out.println(getResponse("Test"));
-                    toClient.writeBytes(getResponse("Test") + '\n'); // Response
+                    toClient.writeBytes(getResponse(Fridge.getCurrentValues().toString()) + '\n'); // Response
                 }
             }
             fromClient.close();

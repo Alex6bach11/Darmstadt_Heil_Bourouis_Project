@@ -1,9 +1,14 @@
 package DS_CNAM;
 
+import javax.json.Json;
 import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.json.stream.JsonParser;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -24,20 +29,18 @@ public class UDPFridgeServer extends Thread {
             DatagramPacket packet;
             DatagramSocket socket = new DatagramSocket(1313);
             System.out.println("UDP Fridge Server started at Port 1313");
-            int port;
-            String s = "", message ="";
+
+            String message ="";
+            JsonReader reader;
             while ( true )
             {
                 // Wait for request
                 packet = new DatagramPacket(data, data.length);
                 socket.receive(packet);
                 // Decode sender, ignore all other content
-                InetAddress address = packet.getAddress();
-
-                port   = packet.getPort();
                 message = new String(packet.getData());
-
-                System.out.println("Test " +message);
+                reader = Json.createReader(new StringReader(message));
+                Fridge.setCurrentValues(reader.readObject());
             }
         }
         catch (Exception e)

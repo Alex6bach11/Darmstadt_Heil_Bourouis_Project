@@ -16,6 +16,8 @@ public class Fridge {
     private static JsonObject warningLevels = initializeWarningLevels();
     private static JsonObject currentValues = initializeValues();
 
+
+
     private static JsonObject initializeWarningLevels() {
         JsonObject obj = Json.createObjectBuilder()
                 .add("Tequila", 1.0f)
@@ -70,5 +72,13 @@ public class Fridge {
         {
             System.out.println(e);
         }
+    }
+
+    public static JsonObject getCurrentValues() {
+        return currentValues;
+    }
+
+    public static void setCurrentValues(JsonObject currentValues) {
+        Fridge.currentValues = currentValues;
     }
 }

@@ -20,7 +20,7 @@ public class Sensor {
     static String host = new String("localhost");
     static int port = 1313;
 
-    private static JsonObject currentValues = initializeValues();
+    //private static JsonObject currentValues = initializeValues();
 
     private static JsonObject initializeValues() {
         Random r = new Random();
@@ -33,6 +33,7 @@ public class Sensor {
     }
 
     private static void replaceValue(String key, float value) {
+        JsonObject currentValues = Fridge.getCurrentValues();
         JsonObjectBuilder builder = Json.createObjectBuilder();
         Set<String> set = currentValues.keySet();
         Iterator iter = set.iterator();
@@ -57,13 +58,12 @@ public class Sensor {
         while (true) {
             // Construct and send Request
             socket = new DatagramSocket();
-            msg = currentValues.toString().getBytes();
+            msg = Fridge.getCurrentValues().toString().getBytes();
             address = InetAddress.getByName(host);
 
             packet = new DatagramPacket(msg, msg.length, address, port);
             socket.send(packet);
 
-            System.out.println(new String(packet.getData()));
             socket.close();
             decrease();
             try {
@@ -76,6 +76,7 @@ public class Sensor {
 
     private static void decrease() {
         Float f;
+        JsonObject currentValues = Fridge.getCurrentValues();
         Random r = new Random();
         Set<String> key = currentValues.keySet();
         Iterator iter = key.iterator();
@@ -83,9 +84,14 @@ public class Sensor {
         while(iter.hasNext()) {
             next = iter.next().toString();
             f= Float.parseFloat(currentValues.get(next).toString());
+            System.out.println("f =" +  f);
             f -= r.nextInt();
-            if (f > 0){
+            if (f >= 0){
                 replaceValue(next, f);
+            }
+            else
+            {
+                replaceValue(next, 0f);
             }
         }
         // currentValues.forEach();
