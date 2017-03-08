@@ -10,10 +10,10 @@ public class Fridge {
 
     private static JsonObject initializeWarningLevels() {
         JsonObject obj = Json.createObjectBuilder()
-                .add("Tequila", 15555.0f)
-                .add("Chicken", 1656.0f)
-                .add("Milk", 1555.0f)
-                .add("Limes", 2222.0f).build();
+                .add("Tequila", 8.0f)
+                .add("Chicken", 5.0f)
+                .add("Milk", 10.0f)
+                .add("Limes", 10.0f).build();
         return obj;
     }
 

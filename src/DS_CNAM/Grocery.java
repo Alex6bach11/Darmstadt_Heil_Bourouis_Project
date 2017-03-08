@@ -35,9 +35,10 @@ public class Grocery {
   }
 
   private Product getProductByName(String productName) {
+      System.out.println(productName);
     for (Product product : products)
     {
-      if (product.getName().toLowerCase() == productName.toLowerCase())
+      if (product.getName().toLowerCase().trim().equals(productName.toLowerCase().trim()))
       {
         return product;
       }
@@ -48,10 +49,14 @@ public class Grocery {
   private static ArrayList<Product> initializeProducts() {
     ArrayList<Product> products = new ArrayList<>();
     Random random = new Random();
-    products.add(new Product("Tequila", random.nextInt(), random.nextFloat()));
-    products.add(new Product("Chicken", random.nextInt(), random.nextFloat()));
-    products.add(new Product("Milk", random.nextInt(), random.nextFloat()));
-    products.add(new Product("Limes", random.nextInt(), random.nextFloat()));
+    products.add(new Product("Tequila", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
+    products.add(new Product("Chicken", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
+    products.add(new Product("Milk", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
+    products.add(new Product("Limes", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
+      System.out.println(products.get(0).getName() + " : " + products.get(0).getQuantity() + " (" + products.get(0).getPrice() + " €)");
+      System.out.println(products.get(1).getName() + " : " + products.get(1).getQuantity() + " (" + products.get(1).getPrice() + " €)");
+      System.out.println(products.get(2).getName() + " : " + products.get(2).getQuantity() + " (" + products.get(2).getPrice() + " €)");
+      System.out.println(products.get(3).getName() + " : " + products.get(3).getQuantity() + " (" + products.get(3).getPrice() + " €)");
     return products;
   }
 
@@ -62,6 +67,7 @@ public class Grocery {
    * @return an empty string if the transaction is successful or the error if it isn't
    */
   public String buy(String productName, int quantity) {
+      System.out.println("Start selling " + quantity + " " + productName + "...");
     Product product = getProductByName(productName);
     if (product != null) {
       if (product.getQuantity() >= quantity && quantity > 0) {
@@ -95,14 +101,12 @@ public class Grocery {
 
      XmlRpcServerConfigImpl serverConfig =
               (XmlRpcServerConfigImpl) xmlRpcServer.getConfig();
-     // serverConfig.setEnabledForExtensions(true);
-     // serverConfig.setContentLengthOptional(false);
 
       webServer.start();
       System.out.println("The Grocery Server has been started..." );
       Random rand = new Random();
       while (true) { // reinitialize quantities and prices
-          Thread.sleep(rand.nextInt() * 10000 + 1);
+          Thread.sleep(rand.nextInt(Integer.SIZE - 1) * 1000);
           products = initializeProducts();
       }
     } catch (Exception exception) {
