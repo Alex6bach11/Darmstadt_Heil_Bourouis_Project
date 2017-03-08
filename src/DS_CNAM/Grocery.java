@@ -14,7 +14,7 @@ public class Grocery {
   private static ArrayList<Product> products = initializeProducts();
   private static File tmpFile;
 
-  private static final int port = 8080;
+  private static final int port = 8081;
 
   private static void addCommandToHistory(String product, float price, float quantity) {
       try {
@@ -35,7 +35,6 @@ public class Grocery {
   }
 
   private Product getProductByName(String productName) {
-      System.out.println(productName);
     for (Product product : products)
     {
       if (product.getName().toLowerCase().trim().equals(productName.toLowerCase().trim()))
@@ -44,6 +43,17 @@ public class Grocery {
       }
     }
     return null;
+  }
+
+  public boolean checkAvailability(String productName, int quantity) {
+      Product product = getProductByName(productName);
+      return product != null && product.getQuantity() >= quantity;
+  }
+
+  public String getPrice(String productName, int quantity) {
+      Product product = getProductByName(productName);
+      float price = product != null? product.getPrice() * quantity : -1;
+      return String.format("00.00", price);
   }
 
   private static ArrayList<Product> initializeProducts() {

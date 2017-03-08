@@ -5,12 +5,11 @@ import java.net.*;
 
 public class TCPFridgeServer extends Thread {
 
-    Socket client;
-
     @Override
     public void run () {
         int port = 9999;
-        ServerSocket listenSocket = null;
+        ServerSocket listenSocket;
+        Socket client;
         try {
             listenSocket = new ServerSocket(port);
 

@@ -15,7 +15,7 @@ import java.util.Set;
 public class Sensor {
     static String host = new String("localhost");
     static int port = 1313;
-    private static JsonObject currentValues ;
+    private static JsonObject currentValues;
 
     private static JsonObject initializeValues() {
         Random r = new Random();
@@ -75,7 +75,7 @@ public class Sensor {
             Random r = new Random();
             Set<String> key = currentValues.keySet();
             Iterator iter = key.iterator();
-            String next = "";
+            String next;
             while (iter.hasNext()) {
                 next = iter.next().toString();
                 f = Float.parseFloat(currentValues.get(next).toString());
@@ -93,6 +93,5 @@ public class Sensor {
         else {
             currentValues = initializeValues();
         }
-
     }
 }

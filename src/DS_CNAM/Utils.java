@@ -6,9 +6,6 @@ import javax.json.JsonObjectBuilder;
 import java.util.Iterator;
 import java.util.Set;
 
-/**
- * Created by Sabrina on 08/03/2017.
- */
 public class Utils {
 
     public static JsonObject replaceValue(JsonObject currentValues, String key, float value) {
@@ -18,7 +15,7 @@ public class Utils {
         String next;
         while(iter.hasNext()) {
             next = iter.next().toString();
-            if (next != key) {
+            if (!next.equals(key)) {
                 builder.add(next, Float.parseFloat(currentValues.get(next).toString()));
             } else {
                 builder.add(next, value);
@@ -27,5 +24,4 @@ public class Utils {
         currentValues = builder.build();
         return currentValues;
     }
-
 }

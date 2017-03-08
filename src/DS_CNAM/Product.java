@@ -42,8 +42,4 @@ public class Product {
             System.err.println("Not enough products !");
         }
     }
-
-    public void changePriceRandomly() {
-
-    }
 }
