@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public class UDPFridgeServer extends Thread {
 
-    private static String[] groceriesURLs = {"http://127.0.0.1:8081/xmlrpc"}; // The URLs of the groceries
+    private static String[] groceriesURLs = {"http://127.0.0.1:8080/xmlrpc", "http://141.100.45.127:8080/xmlrpc"}; // The URLs of the groceries
 
     @Override
     public void run() {

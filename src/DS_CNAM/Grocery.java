@@ -69,7 +69,12 @@ public class Grocery {
      */
     public boolean checkAvailability(String productName, int quantity) {
         Product product = getProductByName(productName);
-        return product != null && product.getQuantity() >= quantity;
+        if (product != null && product.getQuantity() >= quantity) {
+            return true;
+        } else {
+            orderProduct(product.getName());
+            return false;
+        }
     }
 
     /**
@@ -120,9 +125,6 @@ public class Grocery {
         if (product != null) {
             if (product.getQuantity() >= quantity && quantity > 0) {
                 product.sell(quantity);
-                if (product.getQuantity() > 5) {
-                    orderProduct(product.getName());
-                }
                 addCommandToHistory(productName, product.getPrice(), quantity);
                 return "";
             } else {
@@ -137,8 +139,11 @@ public class Grocery {
         }
     }
 
+    /**
+     *
+     * @param name
+     */
     private void orderProduct(String name) {
-
         boolean first;
         Product p = getProductByName(name);
         String supplierName = "";
@@ -177,7 +182,6 @@ public class Grocery {
      * @param topic The topic to subscribe to.
      */
     private void subscribe(String topic) {
-
         MemoryPersistence persistence = new MemoryPersistence();
 
         try {
@@ -215,9 +219,6 @@ public class Grocery {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            // sampleClient.disconnect();
-            //System.out.println("Disconnected");
-
         } catch (MqttException me) {
             System.out.println("reason " + me.getReasonCode());
             System.out.println("msg " + me.getMessage());
@@ -260,7 +261,6 @@ public class Grocery {
                 sup.setProductsToSell(prod);
                 suppliers.add(sup);
             }
-            //updateProducts();
         }
     }
 
@@ -284,7 +284,6 @@ public class Grocery {
             String topic = Utils.topics.get((r.nextInt(Integer.SIZE - 1)) % Utils.topics.size());
             System.out.println("Subscribe to topic : " + topic);
             g.subscribe(topic);
-            Random rand = new Random();
         } catch (Exception exception) {
             System.err.println("JavaServer: " + exception);
         }
