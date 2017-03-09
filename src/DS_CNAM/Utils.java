@@ -15,7 +15,7 @@ public class Utils {
         add("Milk");
         add("Limes");
     }};
-    public static String broker = "tcp://localhost:1883"; // Address:port of Mosquitto
+    public static String broker = "tcp://141.100.45.127:1883"; // Address:port of Mosquitto
     public static ArrayList<String> topics = new ArrayList<String>() {{
         add("Topic 1");
         add("Topic 2");

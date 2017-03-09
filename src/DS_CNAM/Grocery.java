@@ -15,9 +15,9 @@ public class Grocery {
 
     private static ArrayList<Product> products = initializeProducts(); // The products of the Grocery
     private static File tmpFile; // The file that contains the commands history of the Grocery
-    private static ArrayList<Supplier> suppliers = new ArrayList<>();
     private MqttClient sampleClient;
-    private static final int port = 8081; // The port of the XML-RPC server
+    private static ArrayList<Supplier> suppliers = new ArrayList<>(); // The list of suppliers
+    private static final int port = 8080; // The port of the XML-RPC server
 
     /**
      * Add a command to the command history.

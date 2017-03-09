@@ -18,7 +18,7 @@ import java.util.Set;
  */
 public class UDPFridgeServer extends Thread {
 
-    private static String[] groceriesURLs = {"http://127.0.0.1:8081/xmlrpc"}; // The URL of the groceries
+    private static String[] groceriesURLs = {"http://127.0.0.1:8081/xmlrpc"}; // The URLs of the groceries
 
     @Override
     public void run() {
@@ -84,7 +84,7 @@ public class UDPFridgeServer extends Thread {
                 try {
                     bestPrice = -1;
                     cheapestGrocery = "";
-                    params = new Object[]{product, random.nextInt(Integer.SIZE - 1) + 1};
+                    params = new Object[]{product, random.nextInt(10) + 1};
                     for (String grocery : groceriesURLs) {
                         // connect to the groceries
                         config = new XmlRpcClientConfigImpl();

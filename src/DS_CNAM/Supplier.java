@@ -10,9 +10,7 @@ public class Supplier extends Thread implements MqttCallback {
 
     private ArrayList<Product> productsToSell = initializeProducts(); // A list of products to sell
     private String clientId;  // The id of the supplier
-
-
-    MqttClient sampleClient;
+    private MqttClient sampleClient;
 
     public Supplier(String id) {
         this.clientId = id;
@@ -20,6 +18,7 @@ public class Supplier extends Thread implements MqttCallback {
 
     /**
      * Initializes the list of product randomly.
+     *
      * @return
      */
     private ArrayList<Product> initializeProducts() {
@@ -78,6 +77,10 @@ public class Supplier extends Thread implements MqttCallback {
         this.publishMessage(topic, msg);
     }
 
+    /**
+     * @param topic
+     * @param content
+     */
     public void publishMessage(String topic, String content) {
         int qos = 2;
 
@@ -93,7 +96,6 @@ public class Supplier extends Thread implements MqttCallback {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
         } catch (MqttException me) {
             System.out.println("reason : " + me.getReasonCode());
             System.out.println("message : " + me.getMessage());
@@ -108,41 +110,61 @@ public class Supplier extends Thread implements MqttCallback {
     public void connectionLost(Throwable throwable) {
         System.out.println("Error : Mosquitto : Connection Lost ");
     }
-
+    
     @Override
     public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
         if (mqttMessage != null) {
             String[] msg = new String(mqttMessage.getPayload()).split(":");
             if (msg.length == 2) {
-                setQuantityProduct(msg[0], Float.parseFloat(msg[1]));
+                reduceProductQuantity(msg[0], Float.parseFloat(msg[1]));
             }
         }
     }
 
-    private void setQuantityProduct(String s, float y) {
-        productsToSell.stream().filter(p -> p.getName().equals(s) && y <= p.getQuantity()).forEach(p -> {
-            p.setQuantity(p.getQuantity() - y);
+    /**
+     * Reduce the quantity of product.
+     * @param productName The name of the product.
+     * @param productQuantity The quantity to remove from the stock.
+     */
+    private void reduceProductQuantity(String productName, float productQuantity) {
+        productsToSell.stream().filter(p -> p.getName().equals(productName) && productQuantity <= p.getQuantity()).forEach(p -> {
+            p.setQuantity(p.getQuantity() - productQuantity);
         });
     }
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-
     }
 
+    /**
+     * @return The product to sell list.
+     */
     public ArrayList<Product> getProductsToSell() {
         return productsToSell;
     }
 
+    /**
+     * Sets a new product list to the supplier.
+     *
+     * @param productsToSell The new product list.
+     */
     public void setProductsToSell(ArrayList<Product> productsToSell) {
         this.productsToSell = productsToSell;
     }
 
+    /**
+     * @return The id of the supplier.
+     */
     public String getClientId() {
         return clientId;
     }
 
-    public void setProductsToSell(String id) {
+    /**
+     * Sets a new id to the supplier.
+     *
+     * @param id The new id.
+     */
+    public void setClientId(String id) {
         this.clientId = id;
     }
 }

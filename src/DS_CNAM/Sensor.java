@@ -27,12 +27,12 @@ public class Sensor {
      */
     private static JsonObject initializeValues() {
         Random r = new Random();
-        int modulo = 20; // 19 products maximum
+        int minimum = 20, maximum = 30; // 20 products minimum
         JsonObject obj = Json.createObjectBuilder()
-                .add("Tequila", (r.nextInt(Integer.SIZE - 1) % modulo) + modulo)
-                .add("Chicken", (r.nextInt(Integer.SIZE - 1) % modulo) + modulo)
-                .add("Milk", (r.nextInt(Integer.SIZE - 1) % modulo) + modulo)
-                .add("Limes", (r.nextInt(Integer.SIZE - 1) % modulo) + modulo).build();
+                .add("Tequila", r.nextInt(maximum) + minimum)
+                .add("Chicken", r.nextInt(maximum) + minimum)
+                .add("Milk", r.nextInt(maximum) + minimum)
+                .add("Limes", r.nextInt(maximum) + minimum).build();
         return obj;
     }
 
@@ -55,7 +55,7 @@ public class Sensor {
                 // decrease only if quantity is positive
                 if (quantity > 0) {
                     // decrease the quantity randomly (between 1 and 5)
-                    quantity -= r.nextInt(Integer.SIZE - 1) % 5 + 1;
+                    quantity -= r.nextInt(5) + 1;
 
                     // if the decreased quantity is less than 0
                     if (quantity > 0) {
@@ -104,9 +104,9 @@ public class Sensor {
             currentValues = reader.readObject();
             socket.close();
 
-            // sleep a random time (more than a second)
+            // sleep a random time (between 1 and 5 seconds)
             try {
-                sleepTime = r.nextInt(Integer.SIZE - 1) + 1000;
+                sleepTime = r.nextInt(5000) + 1000;
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
