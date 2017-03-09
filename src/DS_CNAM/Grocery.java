@@ -183,9 +183,9 @@ public class Grocery {
      */
     private void subscribe(String topic) {
         MemoryPersistence persistence = new MemoryPersistence();
-
+        Random r = new Random();
         try {
-            sampleClient = new MqttClient(Utils.broker, "Grocery " + port, persistence);
+            sampleClient = new MqttClient(Utils.broker, "Grocery " + port + r.nextInt(Integer.SIZE-1) , persistence);
 
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
@@ -197,7 +197,7 @@ public class Grocery {
             sampleClient.setCallback(new MqttCallback() {
                 @Override
                 public void connectionLost(Throwable throwable) {
-                    System.out.println("Error : Mosquitto : Connection Lost ");
+                    System.out.println("Error : Mosquitto : Connection Lost " );
                 }
 
                 @Override
