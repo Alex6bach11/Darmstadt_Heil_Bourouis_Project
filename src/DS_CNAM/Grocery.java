@@ -13,16 +13,23 @@ import java.util.Random;
 
 public class Grocery {
 
-    private static ArrayList<Product> products = initializeProducts();
+    private static ArrayList<Product> products = initializeProducts(); // The products of the Grocery
+    private static File tmpFile; // The file that contains the commands history of the Grocery
     private static ArrayList<Supplier> suppliers = new ArrayList<>();
-    private static File tmpFile;
 
-    private static final int port = 8081;
+    private static final int port = 8081; // The port of the XML-RPC server
 
+    /**
+     * Add a command to the command history.
+     *
+     * @param product  The name of the product to add to the history
+     * @param price    The price of the product to add to the history
+     * @param quantity The quantity of the product to add to the history
+     */
     private static void addCommandToHistory(String product, float price, float quantity) {
         try {
             PrintWriter writer;
-            if (tmpFile == null) {
+            if (tmpFile == null) { // write the columns name
                 tmpFile = File.createTempFile("GroceryLog", ".csv");
                 writer = new PrintWriter(tmpFile);
                 writer.println("Product;Price;Quantity");
@@ -30,6 +37,7 @@ public class Grocery {
                 writer = new PrintWriter(new FileWriter(tmpFile, true));
             }
 
+            // write the content
             writer.println(product + ";" + price + ";" + quantity + ";");
             writer.close();
         } catch (IOException e) {
@@ -37,6 +45,12 @@ public class Grocery {
         }
     }
 
+    /**
+     * Returns the product that has the name given in parameters.
+     *
+     * @param productName The name of the product.
+     * @return The product that has the name given in parameters.
+     */
     private Product getProductByName(String productName) {
         for (Product product : products) {
             if (product.getName().toLowerCase().trim().equals(productName.toLowerCase().trim())) {
@@ -46,25 +60,46 @@ public class Grocery {
         return null;
     }
 
+    /**
+     * Check if a product is available in a given quantity.
+     *
+     * @param productName The name of the product.
+     * @param quantity    The quantity.
+     * @return True if the product is available in the given quantity, false otherwise.
+     */
     public boolean checkAvailability(String productName, int quantity) {
         Product product = getProductByName(productName);
         return product != null && product.getQuantity() >= quantity;
     }
 
+    /**
+     * Returns the total price of the quantity of products given in parameters.
+     *
+     * @param productName The name of the product.
+     * @param quantity    The quantity.
+     * @return Total price of the quantity of products given in parameters.
+     */
     public String getPrice(String productName, int quantity) {
         Product product = getProductByName(productName);
         float price = product != null ? product.getPrice() * quantity : -1;
         return String.format("00.00", price);
     }
 
+    /**
+     * Initializes the list of products with a random price and quantity.
+     *
+     * @return The initialized product list.
+     */
     private static ArrayList<Product> initializeProducts() {
         ArrayList<Product> products = new ArrayList<>();
+        // Add the four products with random prices and quantities
         Random random = new Random();
-
         products.add(new Product("Tequila", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
         products.add(new Product("Chicken", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
         products.add(new Product("Milk", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
         products.add(new Product("Limes", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
+        // Print the new prices
+        System.out.println("\nProducts : ");
         System.out.println(products.get(0).getName() + " : " + products.get(0).getQuantity() + " (" + products.get(0).getPrice() + " €)");
         System.out.println(products.get(1).getName() + " : " + products.get(1).getQuantity() + " (" + products.get(1).getPrice() + " €)");
         System.out.println(products.get(2).getName() + " : " + products.get(2).getQuantity() + " (" + products.get(2).getPrice() + " €)");
@@ -73,6 +108,8 @@ public class Grocery {
     }
 
     /**
+     * Sell a product in the quantity given in parameters.
+     *
      * @param productName The name of the product to buy
      * @param quantity    The quantity to buy
      * @return an empty string if the transaction is successful or the error if it isn't
@@ -80,27 +117,23 @@ public class Grocery {
     public String buy(String productName, int quantity) {
         System.out.println("Start selling " + quantity + " " + productName + "...");
         Product product = getProductByName(productName);
+        String err;
         if (product != null) {
             if (product.getQuantity() >= quantity && quantity > 0) {
-                try {
-                    product.sell(quantity);
-                    addCommandToHistory(productName, product.getPrice(), quantity);
-                    return "";
-                } catch (Error e) {
-                    e.printStackTrace();
-                    return e.getMessage();
-                }
+                product.sell(quantity);
+                addCommandToHistory(productName, product.getPrice(), quantity);
+                return "";
             } else {
-                return "Product not available in this quantity (" + product.getQuantity() + " remaining)";
+                err = "Product not available in this quantity (" + product.getQuantity() + " remaining)";
+                System.out.println(err);
+                return err;
             }
         } else {
-            return "Product not available";
-        }
-    }
-
+            err = "Product not available";
+            System.out.println(err);
+            return err;
 
     private void subscribe(String topic) {
-
         MemoryPersistence persistence = new MemoryPersistence();
 
         try {
@@ -112,8 +145,8 @@ public class Grocery {
             sampleClient.connect(connOpts);
             System.out.println("Connected");
 
-            sampleClient.subscribe(topic);
             sampleClient.setCallback(new MqttCallback() {
+            sampleClient.subscribe(topic);
                 @Override
                 public void connectionLost(Throwable throwable) {
                     System.out.println("Error : Mosquitto : Connection Lost ");
@@ -133,14 +166,14 @@ public class Grocery {
                 }
             });
 
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+
+            System.out.println("Disconnected");
             }
             // sampleClient.disconnect();
-            System.out.println("Disconnected");
-
+                e.printStackTrace();
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+            try {
         } catch (MqttException me) {
             System.out.println("reason " + me.getReasonCode());
             System.out.println("msg " + me.getMessage());
@@ -198,11 +231,19 @@ public class Grocery {
             }
         }
     }
-
-
     public static void main(String[] args) {
         try {
             WebServer webServer = new WebServer(port);
+
+
+<<<<<<<
+    public static void main(String[] args) {
+        try {
+            WebServer webServer = new WebServer(port);
+=======
+            phm.addHandler("Grocery", Grocery.class);
+            xmlRpcServer.setHandlerMapping(phm);
+>>>>>>>
 
             XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
             PropertyHandlerMapping phm = new PropertyHandlerMapping();

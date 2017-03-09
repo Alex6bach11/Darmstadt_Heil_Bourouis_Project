@@ -6,12 +6,17 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-public class FridgeService extends Thread{
+/**
+ * A thread that communicate with the browser.
+ */
+public class FridgeService extends Thread {
     private Socket client;
 
-    FridgeService(Socket client){this.client = client;}
+    FridgeService(Socket client) {
+        this.client = client;
+    }
 
-    public String getResponse(JsonObject content){
+    public String getResponse(JsonObject content) {
         String response = "";
 
         if (content != null) {
@@ -25,35 +30,34 @@ public class FridgeService extends Thread{
     }
 
     @Override
-    public void run (){
+    public void run() {
         String line;
         BufferedReader fromClient;
         DataOutputStream toClient;
         boolean verbunden = true;
-        int i =0;
-        System.out.println("Thread started: "+this); // Display Thread-ID
-        try{
+        int i = 0;
+        System.out.println("Thread started: " + this); // Display Thread-ID
+        try {
             fromClient = new BufferedReader              // Datastream FROM Client
                     (new InputStreamReader(client.getInputStream()));
-            toClient = new DataOutputStream (client.getOutputStream()); // TO Client
-            while(verbunden && i < 2){     // repeat as long as connection exists
+            toClient = new DataOutputStream(client.getOutputStream()); // TO Client
+            while (verbunden && i < 2) {     // repeat as long as connection exists
                 line = fromClient.readLine();              // Read Request
 
-                System.out.println("Received: "+ line != null ? line : "");
+                System.out.println("Received: " + line != null ? line : "");
 
-                if (line == null || line.isEmpty() ) {
+                if (line == null || line.isEmpty()) {
                     verbunden = false;   // Break Connection?
-                }
-                else {
-                    toClient.writeBytes(getResponse(Fridge.getCurrentValues()) ); // Response
+                } else {
+                    toClient.writeBytes(getResponse(Fridge.getCurrentValues())); // Response
                 }
                 i++;
             }
             fromClient.close();
             toClient.close();
             client.close(); // End
-            System.out.println("Thread ended: "+this);
-        }catch (Exception e){
+            System.out.println("Thread ended: " + this);
+        } catch (Exception e) {
             System.out.println(e);
         }
     }

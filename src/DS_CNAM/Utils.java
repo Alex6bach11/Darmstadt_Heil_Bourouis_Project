@@ -9,6 +9,14 @@ import java.util.Set;
 
 public class Utils {
 
+    /**
+     * Replace a value in a JsonObject.
+     *
+     * @param currentValues The JsonObject where the value has to be replaced.
+     * @param key           The key to find in the object, where the value has to be replaced.
+     * @param value         The new value.
+     * @return The new JsonObject where the value has been replaced.
+     */
     public static ArrayList<String> productNames = new ArrayList<String>() {{
         add("Tequila");
         add("Chicken");
@@ -29,11 +37,11 @@ public class Utils {
         Set<String> set = currentValues.keySet();
         Iterator iter = set.iterator();
         String next;
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
             next = iter.next().toString();
             if (!next.equals(key)) {
                 builder.add(next, Float.parseFloat(currentValues.get(next).toString()));
-            } else {
+            } else { // add the new value
                 builder.add(next, value);
             }
         }

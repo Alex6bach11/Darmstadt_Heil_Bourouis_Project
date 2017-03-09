@@ -13,22 +13,27 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
+/**
+ * UDP server used to communicate with the sensors and the groceries.
+ */
 public class UDPFridgeServer extends Thread {
 
-    @Override
-    public void run (){
-        try
-        {
-            byte data[] = new byte[1024];
-            byte msg[];
-            DatagramPacket packet;
-            DatagramSocket socket = new DatagramSocket(1313);
-            System.out.println("UDP Fridge Server started at Port 1313");
+    private static String[] groceriesURLs = {"http://127.0.0.1:8081/xmlrpc"}; // The URL of the groceries
 
-            String message;
-            JsonReader reader;
-            while ( true )
-            {
+    @Override
+    public void run() {
+        int port = 1313;
+        byte data[] = new byte[1024];
+        byte msg[];
+        DatagramPacket packet;
+
+        String message;
+        JsonReader reader;
+        try {
+            DatagramSocket socket = new DatagramSocket(port);
+            System.out.println("UDP Fridge Server started at Port " + port);
+
+            while (true) {
                 // Wait for request
                 packet = new DatagramPacket(data, data.length);
                 socket.receive(packet);
@@ -37,24 +42,26 @@ public class UDPFridgeServer extends Thread {
                 System.out.println(message);
                 reader = Json.createReader(new StringReader(message));
 
+                // Update quantities with the received values
                 Fridge.setCurrentValues(reader.readObject());
-                orderProducts();
+                orderProducts(); // order products if the warning level is reached
                 msg = Fridge.getCurrentValues().toString().getBytes();
 
+                // Send quantities to the client
                 packet = new DatagramPacket(msg, msg.length, packet.getAddress(), packet.getPort());
                 socket.send(packet);
                 System.out.println(Fridge.getCurrentValues());
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
 
+    /**
+     * Compares the prices of the products to order if the warning limit is reached and order the available cheapest products.
+     */
     private void orderProducts() {
-        String[] groceriesURLs = {"http://127.0.0.1:8080/xmlrpc", "http://127.0.0.1:8081/xmlrpc"};
-        String next;
+        String product;
         Float curVal, warningVal;
         JsonObject currentValues = Fridge.getCurrentValues(), warningLevels = Fridge.getWarningLevels();
         Set<String> key = currentValues.keySet();
@@ -65,44 +72,49 @@ public class UDPFridgeServer extends Thread {
         String result;
         boolean available;
         Random random = new Random();
-        float newQuantity;
-        float bestPrice;
+        float newQuantity,  bestPrice;
         String cheapestGrocery;
         while (iter.hasNext()) {
-            next = iter.next().toString();
-            curVal = Float.parseFloat(currentValues.get(next).toString());
-            warningVal = Float.parseFloat(warningLevels.get(next).toString());
+            product = iter.next().toString();
+            curVal = Float.parseFloat(currentValues.get(product).toString());
+            warningVal = Float.parseFloat(warningLevels.get(product).toString());
 
-            if(curVal <= warningVal) {
+            // if the warning level is reached for this product
+            if (curVal <= warningVal) {
                 try {
                     bestPrice = -1;
                     cheapestGrocery = "";
-                    params = new Object[]{next, random.nextInt(Integer.SIZE - 1) + 1};
-                    for (String grocery : groceriesURLs)
-                    {
+                    params = new Object[]{product, random.nextInt(Integer.SIZE - 1) + 1};
+                    for (String grocery : groceriesURLs) {
+                        // connect to the groceries
                         config = new XmlRpcClientConfigImpl();
                         config.setServerURL(new URL(grocery));
 
                         client = new XmlRpcClient();
                         client.setConfig(config);
+                        // check availability of the products in the grocery
                         available = (boolean) client.execute("Grocery.checkAvailability", params);
-                        if (available) {
+                        if (available) { // get the total price if the product is available
                             result = (String) client.execute("Grocery.getPrice", params);
-                            if (bestPrice < 0 || bestPrice > Float.parseFloat(result)) {
+                            if (bestPrice < 0 || bestPrice > Float.parseFloat(result)) { // update the best price if necessary
                                 bestPrice = Float.parseFloat(result);
                                 cheapestGrocery = grocery;
                             }
                         }
                     }
+                    // if the product is available in a grocery in this quantity, process the order to the cheapest one
                     if (bestPrice >= 0) {
+                        // connect to the cheapest known grocery
                         config = new XmlRpcClientConfigImpl();
                         config.setServerURL(new URL(cheapestGrocery));
 
                         client = new XmlRpcClient();
                         client.setConfig(config);
 
+                        // process the order
                         result = (String) client.execute("Grocery.buy", params);
                         if (!result.equals("")) {
+                            // print errors
                             System.err.println("Error : " + result);
                         } else {
                             // Update current values
@@ -121,5 +133,4 @@ public class UDPFridgeServer extends Thread {
             }
         }
     }
-
 }
