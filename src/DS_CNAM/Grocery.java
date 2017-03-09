@@ -15,7 +15,7 @@ public class Grocery {
 
     private static ArrayList<Product> products = new ArrayList<>(); // = initializeProducts(); // The products of the Grocery
     private static File tmpFile; // The file that contains the commands history of the Grocery
-    private static ArrayList<Supplier> suppliers = new ArrayList<>();
+    private static ArrayList<Supplier> suppliers = new ArrayList<>(); // The list of suppliers
 
     private static final int port = 8081; // The port of the XML-RPC server
 
@@ -94,16 +94,15 @@ public class Grocery {
         ArrayList<Product> products = new ArrayList<>();
         // Add the four products with random prices and quantities
         Random random = new Random();
-        products.add(new Product("Tequila", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
-        products.add(new Product("Chicken", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
-        products.add(new Product("Milk", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
-        products.add(new Product("Limes", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
+        products.add(new Product("Tequila", 0, Float.MAX_VALUE));
+        products.add(new Product("Chicken", 0, Float.MAX_VALUE));
+        products.add(new Product("Milk", 0, Float.MAX_VALUE));
+        products.add(new Product("Limes", 0, Float.MAX_VALUE));
         // Print the new prices
         System.out.println("\nProducts : ");
-        System.out.println(products.get(0).getName() + " : " + products.get(0).getQuantity() + " (" + products.get(0).getPrice() + " €)");
-        System.out.println(products.get(1).getName() + " : " + products.get(1).getQuantity() + " (" + products.get(1).getPrice() + " €)");
-        System.out.println(products.get(2).getName() + " : " + products.get(2).getQuantity() + " (" + products.get(2).getPrice() + " €)");
-        System.out.println(products.get(3).getName() + " : " + products.get(3).getQuantity() + " (" + products.get(3).getPrice() + " €)");
+        for (Product product : products) {
+            System.out.println(product.getName() + " : " + product.getQuantity() + " (" + product.getPrice() + " €)");
+        }
         return products;
     }
 
@@ -135,10 +134,13 @@ public class Grocery {
         }
     }
 
+    /**
+     * Subscribe to a topic.
+     *
+     * @param topic The topic to subscribe to.
+     */
     private void subscribe(String topic) {
-
         MemoryPersistence persistence = new MemoryPersistence();
-
         try {
             MqttClient sampleClient = new MqttClient(Utils.broker, "Grocery "+ port, persistence);
 
@@ -187,6 +189,9 @@ public class Grocery {
         }
     }
 
+    /**
+     * @param s
+     */
     private void updateSuppliers(String s) {
         System.out.println("Message : " + s);
         String[] suppl = s.split("__");
@@ -220,19 +225,22 @@ public class Grocery {
         }
     }
 
+    /**
+     *
+     */
     private void updateProducts() {
         boolean first;
-        for (Product p : products) {
+        for (Product product : products) {
             first = true;
-            for (Supplier s : suppliers) {
-                for (Product prod : s.getProductsToSell()) {
-                    if (first && p.getName().equals(prod.getName())) {
-                        p.setPrice(prod.getPrice());
-                        p.setQuantity(prod.getQuantity());
+            for (Supplier supplier : suppliers) {
+                for (Product supplierProduct : supplier.getProductsToSell()) {
+                    if (first && product.getName().equals(supplierProduct.getName())) {
+                        product.setPrice(supplierProduct.getPrice());
+                        product.setQuantity(supplierProduct.getQuantity());
                         first = false;
-                    } else if (p.getName().equals(prod.getName()) && p.getPrice() > prod.getPrice()) {
-                        p.setPrice(prod.getPrice());
-                        p.setQuantity(prod.getQuantity());
+                    } else if (product.getName().equals(supplierProduct.getName()) && product.getPrice() > supplierProduct.getPrice()) {
+                        product.setPrice(supplierProduct.getPrice());
+                        product.setQuantity(supplierProduct.getQuantity());
                     }
                 }
             }
@@ -258,7 +266,6 @@ public class Grocery {
             String topic = Utils.topics.get((r.nextInt(Integer.SIZE - 1)) % Utils.topics.size());
             System.out.println("Subscribe to topic : " + topic);
             g.subscribe(topic);
-            Random rand = new Random();
         } catch (Exception exception) {
             System.err.println("JavaServer: " + exception);
         }
