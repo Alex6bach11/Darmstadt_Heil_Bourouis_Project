@@ -10,11 +10,12 @@ import java.util.stream.Collectors;
 /**
  * Created by aheil on 08/03/2017.
  */
-public class Supplier implements MqttCallback {
+public class Supplier extends Thread implements MqttCallback {
 
 
     private ArrayList<Product> productsToSell = initializeProducts();
     private String clientId;
+    MqttClient sampleClient;
 
     public Supplier(String id) {
         this.clientId = id;
@@ -29,30 +30,55 @@ public class Supplier implements MqttCallback {
         return res;
     }
 
-    public void publishMessage(String topic, String content) {
-
-        int qos = 2;
+    @Override
+    public void run() {
         MemoryPersistence persistence = new MemoryPersistence();
-
         try {
-            MqttClient sampleClient = new MqttClient(Utils.broker, clientId, persistence);
+
+            sampleClient = new MqttClient(Utils.broker, clientId, persistence);
             sampleClient.setCallback(this);
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
+
             System.out.println("Connecting to broker: " + Utils.broker);
             sampleClient.connect(connOpts);
-            System.out.println("Publishing on :" + topic +" message: " + content);
+            sampleClient.subscribe(this.getClientId());
+            ArrayList<Product> products = new ArrayList<>();
+
+            Random r = new Random();
+            products.add(new Product(Utils.productNames.get(r.nextInt(Integer.SIZE - 1) % Utils.productNames.size()), r.nextInt(Integer.SIZE - 1) * 1000, Math.round(r.nextFloat() * 1000) / 100f));
+            this.setProductsToSell(products);
+
+            String msg = this.getClientId();
+            for (Product p : products) {
+                msg += "__" + p.display();
+            }
+
+            String topic = Utils.topics.get((r.nextInt(Integer.SIZE - 1)) % Utils.topics.size());
+            System.out.println("Publish to topic : " + topic + " Message : " + msg);
+            this.publishMessage(topic, msg);
+        } catch (MqttSecurityException e) {
+            e.printStackTrace();
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void publishMessage(String topic, String content) {
+        int qos = 2;
+
+        try {
+            System.out.println("Publishing on :" + topic + " message: " + content);
             MqttMessage message = new MqttMessage(content.getBytes());
             message.setQos(qos);
+
             sampleClient.publish(topic, message);
-            sampleClient.subscribe(this.getClientId());
+
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            // sampleClient.disconnect();
-            //System.out.println("Disconnected");
 
         } catch (MqttException me) {
             System.out.println("reason " + me.getReasonCode());
@@ -71,9 +97,9 @@ public class Supplier implements MqttCallback {
 
     @Override
     public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-        if(mqttMessage != null) {
+        if (mqttMessage != null) {
             String[] msg = new String(mqttMessage.getPayload()).split(":");
-            if(msg.length == 2) {
+            if (msg.length == 2) {
                 setQuantityProduct(msg[0], Float.parseFloat(msg[1]));
             }
         }

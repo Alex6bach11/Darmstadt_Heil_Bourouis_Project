@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class Grocery {
 
-    private static ArrayList<Product> products = initializeProducts(); // The products of the Grocery
+    private static ArrayList<Product> products = new ArrayList<>(); // = initializeProducts(); // The products of the Grocery
     private static File tmpFile; // The file that contains the commands history of the Grocery
     private static ArrayList<Supplier> suppliers = new ArrayList<>();
 
@@ -140,7 +140,7 @@ public class Grocery {
         MemoryPersistence persistence = new MemoryPersistence();
 
         try {
-            MqttClient sampleClient = new MqttClient(Utils.broker, "Test", persistence);
+            MqttClient sampleClient = new MqttClient(Utils.broker, "Grocery "+ port, persistence);
 
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
@@ -158,8 +158,8 @@ public class Grocery {
                 @Override
                 public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
                     System.out.println("######################### Message reçu ");
-                    if (mqttMessage != null) {
-                        updateSuppliers(s);
+                    if (mqttMessage != null && mqttMessage.getPayload() != null) {
+                        updateSuppliers(new String(mqttMessage.getPayload()));
                     }
                 }
 
@@ -188,26 +188,32 @@ public class Grocery {
     }
 
     private void updateSuppliers(String s) {
-        String[] supplier = s.split("||");
+        System.out.println("Message : " + s);
+        String[] suppl = s.split("__");
         boolean trouve = false;
-        if (supplier.length >= 2) {
-            System.out.println("Supplier : " + supplier[0]);
-            ArrayList<Product> products = new ArrayList<>();
+        if (suppl.length >= 2) {
+
+            ArrayList<Product> prod = new ArrayList<>();
             for (Supplier sup : suppliers) {
-                if (supplier[0].equals(sup.getClientId())) {
+                System.out.println("Supplier : " + sup.getClientId());
+                if (suppl[0].equals(sup.getClientId())) {
                     trouve = true;
-                    for (int i = 1; i < supplier.length; i++) {
-                        products.add(new Product(supplier[i]));
+                    System.out.println("\n  Products : ");
+                    for (int i = 1; i < suppl.length; i++) {
+                        prod.add(new Product(suppl[i]));
+                        System.out.println("    " + prod.get(i-1).getName() + " : " + prod.get(i-1).getQuantity() + " (" + prod.get(i-1).getPrice() + " €)");
                     }
-                    sup.setProductsToSell(products);
+                    sup.setProductsToSell(prod);
                 }
             }
             if (!trouve) {
-                Supplier sup = new Supplier(supplier[0]);
-                for (int i = 1; i < supplier.length; i++) {
-                    products.add(new Product(supplier[i]));
+                Supplier sup = new Supplier(suppl[0]);
+                System.out.println("Supplier : " + sup.getClientId() + "\nProducts : ");
+                for (int i = 1; i < suppl.length; i++) {
+                    prod.add(new Product(suppl[i]));
+                    System.out.println("    " + prod.get(i-1).getName() + " : " + prod.get(i-1).getQuantity() + " (" + prod.get(i-1).getPrice() + " €)");
                 }
-                sup.setProductsToSell(products);
+                sup.setProductsToSell(prod);
                 suppliers.add(sup);
             }
             updateProducts();
@@ -253,10 +259,6 @@ public class Grocery {
             System.out.println("Subscribe to topic : " + topic);
             g.subscribe(topic);
             Random rand = new Random();
-            while (true) { // reinitialize quantities and prices
-                Thread.sleep(rand.nextInt(Integer.SIZE - 1) * 1000);
-                products = initializeProducts();
-            }
         } catch (Exception exception) {
             System.err.println("JavaServer: " + exception);
         }
