@@ -11,8 +11,7 @@ public class Supplier extends Thread implements MqttCallback {
     private ArrayList<Product> productsToSell = initializeProducts(); // A list of products to sell
     private String clientId;  // The id of the supplier
 
-    private ArrayList<Product> productsToSell = initializeProducts();
-    private String clientId;
+
     MqttClient sampleClient;
 
     public Supplier(String id) {
