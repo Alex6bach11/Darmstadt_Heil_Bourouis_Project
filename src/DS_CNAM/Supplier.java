@@ -43,25 +43,39 @@ public class Supplier extends Thread implements MqttCallback {
             System.out.println("Connecting to broker: " + Utils.broker);
             sampleClient.connect(connOpts);
             sampleClient.subscribe(this.getClientId());
-            ArrayList<Product> products = new ArrayList<>();
-
             Random r = new Random();
-            products.add(new Product(Utils.productNames.get(r.nextInt(Integer.SIZE - 1) % Utils.productNames.size()), r.nextInt(Integer.SIZE - 1) * 1000, Math.round(r.nextFloat() * 1000) / 100f));
-            this.setProductsToSell(products);
-
-            String msg = this.getClientId();
-            for (Product p : products) {
-                msg += "__" + p.display();
+            while (true) {
+                produce();
+                try {
+                    Thread.sleep(r.nextInt(Integer.SIZE - 1)*1000);
+                }
+                    catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
             }
 
-            String topic = Utils.topics.get((r.nextInt(Integer.SIZE - 1)) % Utils.topics.size());
-            System.out.println("Publish to topic : " + topic + " Message : " + msg);
-            this.publishMessage(topic, msg);
         } catch (MqttSecurityException e) {
             e.printStackTrace();
         } catch (MqttException e) {
             e.printStackTrace();
         }
+    }
+
+    private void produce() {
+        ArrayList<Product> products = new ArrayList<>();
+
+        Random r = new Random();
+        products.add(new Product(Utils.productNames.get(r.nextInt(Integer.SIZE - 1) % Utils.productNames.size()), r.nextInt(Integer.SIZE - 1) * 1000, Math.round(r.nextFloat() * 1000) / 100f));
+        this.setProductsToSell(products);
+
+        String msg = this.getClientId();
+        for (Product p : products) {
+            msg += "__" + p.display();
+        }
+
+        String topic = Utils.topics.get((r.nextInt(Integer.SIZE - 1)) % Utils.topics.size());
+        System.out.println("Publish to topic : " + topic + " Message : " + msg);
+        this.publishMessage(topic, msg);
     }
 
     public void publishMessage(String topic, String content) {

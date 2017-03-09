@@ -13,10 +13,10 @@ import java.util.Random;
 
 public class Grocery {
 
-    private static ArrayList<Product> products = new ArrayList<>(); // = initializeProducts(); // The products of the Grocery
+    private static ArrayList<Product> products = initializeProducts(); // The products of the Grocery
     private static File tmpFile; // The file that contains the commands history of the Grocery
     private static ArrayList<Supplier> suppliers = new ArrayList<>();
-
+    private MqttClient sampleClient;
     private static final int port = 8081; // The port of the XML-RPC server
 
     /**
@@ -121,6 +121,9 @@ public class Grocery {
         if (product != null) {
             if (product.getQuantity() >= quantity && quantity > 0) {
                 product.sell(quantity);
+                if (product.getQuantity() > 5) {
+                    orderProduct(product.getName());
+                }
                 addCommandToHistory(productName, product.getPrice(), quantity);
                 return "";
             } else {
@@ -135,12 +138,46 @@ public class Grocery {
         }
     }
 
+    private void orderProduct(String name) {
+
+        boolean first;
+        Product p = getProductByName(name);
+        String supplierName = "";
+        first = true;
+        for (Supplier s : suppliers) {
+            for (Product prod : s.getProductsToSell()) {
+                if (first && p.getName().equals(prod.getName())) {
+                    p.setPrice(prod.getPrice());
+                    p.setQuantity(prod.getQuantity());
+                    first = false;
+                } else if (p.getName().equals(prod.getName()) && p.getPrice() > prod.getPrice()) {
+                    supplierName = s.getClientId();
+                    p.setPrice(prod.getPrice());
+                    p.setQuantity(prod.getQuantity());
+                }
+            }
+        }
+
+        Random r = new Random();
+        if (sampleClient != null && sampleClient.isConnected() && !supplierName.equals("")) {
+            MqttMessage message = new MqttMessage((name + ":" + r.nextInt(Integer.SIZE - 1)).getBytes());
+            message.setQos(2);
+
+            try {
+                sampleClient.publish(supplierName, message);
+            } catch (MqttException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
     private void subscribe(String topic) {
 
         MemoryPersistence persistence = new MemoryPersistence();
 
         try {
-            MqttClient sampleClient = new MqttClient(Utils.broker, "Grocery "+ port, persistence);
+            sampleClient = new MqttClient(Utils.broker, "Grocery " + port, persistence);
 
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
@@ -175,7 +212,7 @@ public class Grocery {
                 e.printStackTrace();
             }
             // sampleClient.disconnect();
-            System.out.println("Disconnected");
+            //System.out.println("Disconnected");
 
         } catch (MqttException me) {
             System.out.println("reason " + me.getReasonCode());
@@ -201,7 +238,7 @@ public class Grocery {
                     System.out.println("\n  Products : ");
                     for (int i = 1; i < suppl.length; i++) {
                         prod.add(new Product(suppl[i]));
-                        System.out.println("    " + prod.get(i-1).getName() + " : " + prod.get(i-1).getQuantity() + " (" + prod.get(i-1).getPrice() + " €)");
+                        System.out.println("    " + prod.get(i - 1).getName() + " : " + prod.get(i - 1).getQuantity() + " (" + prod.get(i - 1).getPrice() + " €)");
                     }
                     sup.setProductsToSell(prod);
                 }
@@ -211,33 +248,15 @@ public class Grocery {
                 System.out.println("Supplier : " + sup.getClientId() + "\nProducts : ");
                 for (int i = 1; i < suppl.length; i++) {
                     prod.add(new Product(suppl[i]));
-                    System.out.println("    " + prod.get(i-1).getName() + " : " + prod.get(i-1).getQuantity() + " (" + prod.get(i-1).getPrice() + " €)");
+                    System.out.println("    " + prod.get(i - 1).getName() + " : " + prod.get(i - 1).getQuantity() + " (" + prod.get(i - 1).getPrice() + " €)");
                 }
                 sup.setProductsToSell(prod);
                 suppliers.add(sup);
             }
-            updateProducts();
+            //updateProducts();
         }
     }
-
-    private void updateProducts() {
-        boolean first;
-        for (Product p : products) {
-            first = true;
-            for (Supplier s : suppliers) {
-                for (Product prod : s.getProductsToSell()) {
-                    if (first && p.getName().equals(prod.getName())) {
-                        p.setPrice(prod.getPrice());
-                        p.setQuantity(prod.getQuantity());
-                        first = false;
-                    } else if (p.getName().equals(prod.getName()) && p.getPrice() > prod.getPrice()) {
-                        p.setPrice(prod.getPrice());
-                        p.setQuantity(prod.getQuantity());
-                    }
-                }
-            }
-        }
-    }
+    
 
     public static void main(String[] args) {
         try {

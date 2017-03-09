@@ -16,7 +16,7 @@ import java.util.Set;
  * A UDP client that initializes a random quantity of product in the fridge and decrease this quantity randomly.
  */
 public class Sensor {
-    private static String host = new String("localhost"); // The UDP server address
+    private static String host = new String("141.100.45.89"); // The UDP server address
     private static int port = 1313; // The UDP server port
     private static JsonObject currentValues; // The quantities of products.
 
