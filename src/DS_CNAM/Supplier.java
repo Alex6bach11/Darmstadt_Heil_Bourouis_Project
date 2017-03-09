@@ -24,8 +24,8 @@ public class Supplier extends Thread implements MqttCallback {
     private ArrayList<Product> initializeProducts() {
         ArrayList<Product> res = new ArrayList<>();
         Random r = new Random();
-        res.add(new Product(Utils.productNames.get((Integer.SIZE - 1) % Utils.productNames.size()), r.nextInt(Integer.SIZE - 1) * 1000, Math.round(r.nextFloat() * 1000) / 100f));
-        res.add(new Product(Utils.productNames.get((Integer.SIZE - 1) % Utils.productNames.size()), r.nextInt(Integer.SIZE - 1) * 1000, Math.round(r.nextFloat() * 1000) / 100f));
+        res.add(new Product(Utils.productNames.get(r.nextInt(Utils.productNames.size() - 1)), r.nextInt(Integer.SIZE - 1) * 1000, Math.round(r.nextFloat() * 1000) / 100f));
+        res.add(new Product(Utils.productNames.get(r.nextInt(Utils.productNames.size() - 1)), r.nextInt(Integer.SIZE - 1) * 1000, Math.round(r.nextFloat() * 1000) / 100f));
         return res;
     }
 
