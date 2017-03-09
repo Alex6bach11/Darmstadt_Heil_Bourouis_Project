@@ -5,13 +5,11 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.stream.Collectors;
 
-/**
- * Created by aheil on 08/03/2017.
- */
 public class Supplier extends Thread implements MqttCallback {
 
+    private ArrayList<Product> productsToSell = initializeProducts(); // A list of products to sell
+    private String clientId;  // The id of the supplier
 
     private ArrayList<Product> productsToSell = initializeProducts();
     private String clientId;
@@ -21,12 +19,15 @@ public class Supplier extends Thread implements MqttCallback {
         this.clientId = id;
     }
 
+    /**
+     * Initializes the list of product randomly.
+     * @return
+     */
     private ArrayList<Product> initializeProducts() {
         ArrayList<Product> res = new ArrayList<>();
         Random r = new Random();
         res.add(new Product(Utils.productNames.get((Integer.SIZE - 1) % Utils.productNames.size()), r.nextInt(Integer.SIZE - 1) * 1000, Math.round(r.nextFloat() * 1000) / 100f));
         res.add(new Product(Utils.productNames.get((Integer.SIZE - 1) % Utils.productNames.size()), r.nextInt(Integer.SIZE - 1) * 1000, Math.round(r.nextFloat() * 1000) / 100f));
-        //res.addAll(Utils.productNames.stream().map(name -> new Product(name, r.nextInt(Integer.SIZE - 1) * 1000, Math.round(r.nextFloat() * 1000) / 100f)).collect(Collectors.toList()));
         return res;
     }
 
@@ -95,11 +96,11 @@ public class Supplier extends Thread implements MqttCallback {
             }
 
         } catch (MqttException me) {
-            System.out.println("reason " + me.getReasonCode());
-            System.out.println("msg " + me.getMessage());
-            System.out.println("loc " + me.getLocalizedMessage());
-            System.out.println("cause " + me.getCause());
-            System.out.println("excep " + me);
+            System.out.println("reason : " + me.getReasonCode());
+            System.out.println("message : " + me.getMessage());
+            System.out.println("localized message : " + me.getLocalizedMessage());
+            System.out.println("cause : " + me.getCause());
+            System.out.println("exception : " + me);
             me.printStackTrace();
         }
     }
@@ -117,7 +118,6 @@ public class Supplier extends Thread implements MqttCallback {
                 setQuantityProduct(msg[0], Float.parseFloat(msg[1]));
             }
         }
-        System.out.println("Test : " + s + " :" + mqttMessage.getPayload());
     }
 
     private void setQuantityProduct(String s, float y) {

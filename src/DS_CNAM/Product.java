@@ -19,6 +19,22 @@ public class Product {
     }
 
     /**
+     * Creates a new Product from a string. (name:quantity:price)
+     *
+     * @param productAsString name:quantity:price
+     */
+    public Product(String productAsString) {
+        if (productAsString != null && !productAsString.isEmpty()) {
+            String[] infos = productAsString.split(":");
+            if (infos.length == 3) {
+                this.name = infos[0];
+                this.quantity = Float.valueOf(infos[1]);
+                this.price = Float.valueOf(infos[2]);
+            }
+        }
+    }
+
+    /**
      * @return The name of the product.
      */
     public String getName() {
@@ -79,20 +95,12 @@ public class Product {
         }
     }
 
+    /**
+     * Display product information.
+     *
+     * @return name:quantity:price
+     */
     public String display() {
         return this.getName() + ":" + this.getQuantity() + ":" + this.getPrice();
     }
-
-    public Product(String productAsString) {
-        if( productAsString != null && !productAsString.isEmpty()) {
-            String[] infos = productAsString.split(":");
-            if(infos.length == 3) {
-                this.name = infos[0];
-                this.quantity = Float.valueOf(infos[1]);
-                this.price = Float.valueOf(infos[2]);
-            }
-
-        }
-    }
-
 }

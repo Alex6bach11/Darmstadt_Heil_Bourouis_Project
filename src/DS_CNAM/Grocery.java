@@ -94,16 +94,15 @@ public class Grocery {
         ArrayList<Product> products = new ArrayList<>();
         // Add the four products with random prices and quantities
         Random random = new Random();
-        products.add(new Product("Tequila", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
-        products.add(new Product("Chicken", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
-        products.add(new Product("Milk", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
-        products.add(new Product("Limes", random.nextInt(Integer.SIZE - 1) * 100, Math.round(random.nextFloat() * 1000) / 100f));
+        products.add(new Product("Tequila", 0, Float.MAX_VALUE));
+        products.add(new Product("Chicken", 0, Float.MAX_VALUE));
+        products.add(new Product("Milk", 0, Float.MAX_VALUE));
+        products.add(new Product("Limes", 0, Float.MAX_VALUE));
         // Print the new prices
         System.out.println("\nProducts : ");
-        System.out.println(products.get(0).getName() + " : " + products.get(0).getQuantity() + " (" + products.get(0).getPrice() + " €)");
-        System.out.println(products.get(1).getName() + " : " + products.get(1).getQuantity() + " (" + products.get(1).getPrice() + " €)");
-        System.out.println(products.get(2).getName() + " : " + products.get(2).getQuantity() + " (" + products.get(2).getPrice() + " €)");
-        System.out.println(products.get(3).getName() + " : " + products.get(3).getQuantity() + " (" + products.get(3).getPrice() + " €)");
+        for (Product product : products) {
+            System.out.println(product.getName() + " : " + product.getQuantity() + " (" + product.getPrice() + " €)");
+        }
         return products;
     }
 
@@ -172,6 +171,11 @@ public class Grocery {
         }
     }
 
+    /**
+     * Subscribe to a topic.
+     *
+     * @param topic The topic to subscribe to.
+     */
     private void subscribe(String topic) {
 
         MemoryPersistence persistence = new MemoryPersistence();
@@ -224,6 +228,9 @@ public class Grocery {
         }
     }
 
+    /**
+     * @param s
+     */
     private void updateSuppliers(String s) {
         System.out.println("Message : " + s);
         String[] suppl = s.split("__");
@@ -256,7 +263,7 @@ public class Grocery {
             //updateProducts();
         }
     }
-    
+
 
     public static void main(String[] args) {
         try {

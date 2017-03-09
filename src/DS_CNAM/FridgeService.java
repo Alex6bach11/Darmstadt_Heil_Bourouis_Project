@@ -16,6 +16,12 @@ public class FridgeService extends Thread {
         this.client = client;
     }
 
+    /**
+     * Create an HTTP response from a JsonObject.
+     *
+     * @param content The JsonObject.
+     * @return The HTTP response.
+     */
     public String getResponse(JsonObject content) {
         String response = "";
 
@@ -34,22 +40,22 @@ public class FridgeService extends Thread {
         String line;
         BufferedReader fromClient;
         DataOutputStream toClient;
-        boolean verbunden = true;
+        boolean connected = true;
         int i = 0;
         System.out.println("Thread started: " + this); // Display Thread-ID
         try {
             fromClient = new BufferedReader              // Datastream FROM Client
                     (new InputStreamReader(client.getInputStream()));
             toClient = new DataOutputStream(client.getOutputStream()); // TO Client
-            while (verbunden && i < 2) {     // repeat as long as connection exists
+            while (connected && i < 2) {     // repeat as long as connection exists
                 line = fromClient.readLine();              // Read Request
 
                 System.out.println("Received: " + line != null ? line : "");
 
                 if (line == null || line.isEmpty()) {
-                    verbunden = false;   // Break Connection?
+                    connected = false;   // Break Connection?
                 } else {
-                    toClient.writeBytes(getResponse(Fridge.getCurrentValues())); // Response
+                    toClient.writeBytes(getResponse(Fridge.getCurrentValues())); // Send response
                 }
                 i++;
             }
