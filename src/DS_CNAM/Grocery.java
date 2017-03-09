@@ -132,8 +132,11 @@ public class Grocery {
             err = "Product not available";
             System.out.println(err);
             return err;
+        }
+    }
 
     private void subscribe(String topic) {
+
         MemoryPersistence persistence = new MemoryPersistence();
 
         try {
@@ -145,8 +148,8 @@ public class Grocery {
             sampleClient.connect(connOpts);
             System.out.println("Connected");
 
-            sampleClient.setCallback(new MqttCallback() {
             sampleClient.subscribe(topic);
+            sampleClient.setCallback(new MqttCallback() {
                 @Override
                 public void connectionLost(Throwable throwable) {
                     System.out.println("Error : Mosquitto : Connection Lost ");
@@ -166,14 +169,14 @@ public class Grocery {
                 }
             });
 
-
-            System.out.println("Disconnected");
-            }
-            // sampleClient.disconnect();
-                e.printStackTrace();
+            try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-            try {
+                e.printStackTrace();
+            }
+            // sampleClient.disconnect();
+            System.out.println("Disconnected");
+
         } catch (MqttException me) {
             System.out.println("reason " + me.getReasonCode());
             System.out.println("msg " + me.getMessage());
@@ -199,7 +202,7 @@ public class Grocery {
                     sup.setProductsToSell(products);
                 }
             }
-            if(!trouve) {
+            if (!trouve) {
                 Supplier sup = new Supplier(supplier[0]);
                 for (int i = 1; i < supplier.length; i++) {
                     products.add(new Product(supplier[i]));
@@ -209,21 +212,19 @@ public class Grocery {
             }
             updateProducts();
         }
-
     }
 
     private void updateProducts() {
-        boolean first ;
-        for (Product p : products ) {
+        boolean first;
+        for (Product p : products) {
             first = true;
-            for (Supplier s : suppliers ) {
-                for (Product prod : s.getProductsToSell() ) {
-                    if(first && p.getName().equals(prod.getName())) {
+            for (Supplier s : suppliers) {
+                for (Product prod : s.getProductsToSell()) {
+                    if (first && p.getName().equals(prod.getName())) {
                         p.setPrice(prod.getPrice());
                         p.setQuantity(prod.getQuantity());
                         first = false;
-                    }
-                    else if(p.getName().equals(prod.getName()) && p.getPrice() > prod.getPrice()){
+                    } else if (p.getName().equals(prod.getName()) && p.getPrice() > prod.getPrice()) {
                         p.setPrice(prod.getPrice());
                         p.setQuantity(prod.getQuantity());
                     }
@@ -231,19 +232,10 @@ public class Grocery {
             }
         }
     }
+
     public static void main(String[] args) {
         try {
             WebServer webServer = new WebServer(port);
-
-
-<<<<<<<
-    public static void main(String[] args) {
-        try {
-            WebServer webServer = new WebServer(port);
-=======
-            phm.addHandler("Grocery", Grocery.class);
-            xmlRpcServer.setHandlerMapping(phm);
->>>>>>>
 
             XmlRpcServer xmlRpcServer = webServer.getXmlRpcServer();
             PropertyHandlerMapping phm = new PropertyHandlerMapping();
@@ -257,8 +249,8 @@ public class Grocery {
             webServer.start();
             Grocery g = new Grocery();
             Random r = new Random();
-            String topic = Utils.topics.get((r.nextInt(Integer.SIZE-1))%Utils.topics.size());
-            System.out.println("Subscribe to topic : "+ topic);
+            String topic = Utils.topics.get((r.nextInt(Integer.SIZE - 1)) % Utils.topics.size());
+            System.out.println("Subscribe to topic : " + topic);
             g.subscribe(topic);
             Random rand = new Random();
             while (true) { // reinitialize quantities and prices
