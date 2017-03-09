@@ -139,10 +139,6 @@ public class Grocery {
         }
     }
 
-    /**
-     *
-     * @param name
-     */
     private void orderProduct(String name) {
         boolean first;
         Product p = getProductByName(name);
@@ -229,9 +225,6 @@ public class Grocery {
         }
     }
 
-    /**
-     * @param s
-     */
     private void updateSuppliers(String s) {
         System.out.println("Message : " + s);
         String[] suppl = s.split("__");
@@ -263,7 +256,6 @@ public class Grocery {
             }
         }
     }
-
 
     public static void main(String[] args) {
         try {

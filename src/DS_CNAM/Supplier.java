@@ -19,7 +19,7 @@ public class Supplier extends Thread implements MqttCallback {
     /**
      * Initializes the list of product randomly.
      *
-     * @return
+     * @return The initialized list of product.
      */
     private ArrayList<Product> initializeProducts() {
         ArrayList<Product> res = new ArrayList<>();
@@ -77,10 +77,6 @@ public class Supplier extends Thread implements MqttCallback {
         this.publishMessage(topic, msg);
     }
 
-    /**
-     * @param topic
-     * @param content
-     */
     public void publishMessage(String topic, String content) {
         int qos = 2;
 
